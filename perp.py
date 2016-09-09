@@ -5,6 +5,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from nltk.stem.porter import PorterStemmer
 import re
 from nltk.corpus import stopwords
+from scipy.io import savemat
+from numpy import *
+
 
 cachedStopWords = stopwords.words("english")
 
@@ -67,27 +70,40 @@ def collection_stats():
 
 
 def main():
-    #train_docs = []
+    train_docs = []
     test_docs = []
-    train_docs=['He watches basketball and baseball', 'Julie likes to play basketball', 'Jane loves to play baseball']
+    cat=[]
+    #train_docs=['He watches basketball and baseball', 'Julie likes to play basketball', 'Jane loves to play baseball']
     collection_stats()
-    #for doc_id in reuters.fileids():
-        #if doc_id.startswith("train"):
-            #train_docs.append(reuters.raw(doc_id))
-        #else:
-            #test_docs.append(reuters.raw(doc_id))
+    for doc_id in reuters.fileids():
+        if doc_id.startswith("train"):
+            train_docs.append(reuters.raw(doc_id))
+        else:
+            test_docs.append(reuters.raw(doc_id))
 
     representer = tf_idf(train_docs);
     vocab=representer.vocabulary_
     print ((vocab))
+
     train_tf=get_tf(train_docs,vocab);
     arr=train_tf.toarray();
+    savemat('/home/shashank/features_train.mat', mdict={'feature_vect_train': arr});
+    test_tf = get_tf(test_docs, vocab);
+    arr_test=test_tf.toarray();
+    savemat('/home/shashank/features_test.mat', mdict={'feature_vect_test': arr_test});
+    print(arr_test)
     print(arr)
     print("hello")
-
+    #savemat('/home/shashank/vocab.mat',vocab,oned_as='row');
 
     #for doc in test_docs:
         #print(feature_values(doc, representer))
+    vocab_list=[];
+    for iter in vocab :
+        vocab_list.append(iter)
+
+    savemat('/home/shashank/vocab_list.mat', mdict={'vocab_list': vocab_list});
+
 
 
 if __name__ == "__main__":
